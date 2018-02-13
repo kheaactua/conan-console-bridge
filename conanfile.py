@@ -12,7 +12,7 @@ class ConsolebridgeConan(ConanFile):
     settings = 'os', 'compiler', 'build_type', 'arch'
     generators = 'cmake'
     requires = (
-        'boost/[>1.46]@lasote/stable',
+        'boost/[>1.46]@ntc/stable',
     )
     options = {
         'shared': [True, False],
