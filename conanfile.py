@@ -12,7 +12,7 @@ class ConsolebridgeConan(ConanFile):
     settings = 'os', 'compiler', 'build_type', 'arch'
     generators = 'cmake'
     requires = (
-        'Boost/[>1.46]@conan/stable',
+        'boost/[>1.46]@lasote/stable',
     )
     options = {
         'shared': [True, False],
@@ -20,7 +20,7 @@ class ConsolebridgeConan(ConanFile):
     default_options = ("shared=True")
 
     def configure(self):
-        self.options["Boost"].shared = self.options.shared
+        self.options['boost'].shared = self.options.shared
 
     def source(self):
         self.run(f'git clone https://github.com/ros/console_bridge.git {self.name}')
@@ -33,7 +33,7 @@ class ConsolebridgeConan(ConanFile):
     def build(self):
 
         args = []
-        args.append('-DBOOST_ROOT:PATH=%s'%self.deps_cpp_info['Boost'].rootpath)
+        args.append('-DBOOST_ROOT:PATH=%s'%self.deps_cpp_info['boost'].rootpath)
         args.append('-DBUILD_SHARED_LIBS=%s'%('TRUE' if self.options.shared else 'FALSE'))
 
         cmake = CMake(self)
