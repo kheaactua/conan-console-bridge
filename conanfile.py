@@ -19,9 +19,6 @@ class ConsolebridgeConan(ConanFile):
     }
     default_options = ("shared=True")
 
-    def configure(self):
-        self.options['boost'].shared = self.options.shared
-
     def source(self):
         self.run(f'git clone https://github.com/ros/console_bridge.git {self.name}')
 
