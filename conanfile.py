@@ -3,9 +3,10 @@ from conans import ConanFile, CMake
 
 
 class ConsolebridgeConan(ConanFile):
+    """ Testing with indigo and 0.4.0 """
+
     name = 'console_bridge'
     version = 'indigo'
-    # version = '0.4.0'
     license = 'Creative Commons Attribution 3.0'
     url = 'http://wiki.ros.org/console_bridge'
     description = 'console_bridge is a ROS-independent, pure CMake (i.e. non-catkin and non-rosbuild package) that provides logging calls that mirror those found in rosconsole, but for applications that are not necessarily using ROS.'
