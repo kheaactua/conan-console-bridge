@@ -30,12 +30,16 @@ class ConsolebridgeConan(ConanFile):
 
     def build(self):
 
-        args = []
-        args.append('-DBOOST_ROOT:PATH=%s'%self.deps_cpp_info['boost'].rootpath)
-        args.append('-DBUILD_SHARED_LIBS=%s'%('TRUE' if self.options.shared else 'FALSE'))
-
         cmake = CMake(self)
-        cmake.configure(source_folder=self.name, args=args)
+        cmake.definitions['BOOST_ROOT:PATH'] = self.deps_cpp_info['boost'].rootpath
+        cmake.definitions['BUILD_SHARED_LIBS:BOOL'] = 'TRUE' if self.options.shared else 'FALSE'
+
+        s = '\nCMake Definitions:\n'
+        for k,v in cmake.definitions.items():
+            s += ' - %s=%s\n'%(k, v)
+        self.output.info(s)
+
+        cmake.configure(source_folder=self.name)
         cmake.build()
         cmake.install()
 
