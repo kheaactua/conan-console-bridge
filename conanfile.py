@@ -5,10 +5,10 @@ from conans import ConanFile, CMake, tools
 class ConsolebridgeConan(ConanFile):
     """ Testing with indigo and 0.4.0 """
 
-    name = 'console_bridge'
-    version = 'indigo'
-    license = 'Creative Commons Attribution 3.0'
-    url = 'http://wiki.ros.org/console_bridge'
+    name        = 'console_bridge'
+    version     = 'indigo'
+    license     = 'Creative Commons Attribution 3.0'
+    url         = 'http://wiki.ros.org/console_bridge'
     description = 'console_bridge is a ROS-independent, pure CMake (i.e. non-catkin and non-rosbuild package) that provides logging calls that mirror those found in rosconsole, but for applications that are not necessarily using ROS.'
     settings = 'os', 'compiler', 'build_type', 'arch'
     generators = 'cmake'
@@ -17,8 +17,19 @@ class ConsolebridgeConan(ConanFile):
     )
     options = {
         'shared': [True, False],
+        'fPIC':   [True, False],
+        'cxx11':  [True, False],
     }
-    default_options = ("shared=True")
+    default_options = ('shared=True', 'fPIC=True', 'cxx11=True')
+
+    def config_options(self):
+        if self.settings.compiler == "Visual Studio":
+            self.options.remove("fPIC")
+
+    def configure(self):
+        self.options['boost'].shared = self.options.shared
+        if self.settings.compiler != "Visual Studio":
+            self.options['boost'].fPIC = self.options['boost'].shared
 
     def source(self):
         self.run(f'git clone https://github.com/ros/console_bridge.git {self.name}')
@@ -43,6 +54,12 @@ class ConsolebridgeConan(ConanFile):
         )
 
         cmake = CMake(self)
+
+        if 'fPIC' in self.options and self.options.fPIC:
+            cmake.definitions['CMAKE_POSITION_INDEPENDENT_CODE'] = 'ON'
+        if self.options.cxx11:
+            cmake.definitions['CMAKE_CXX_STANDARD'] = 11
+
         cmake.definitions['BOOST_ROOT:PATH'] = self.deps_cpp_info['boost'].rootpath
         cmake.definitions['BUILD_SHARED_LIBS:BOOL'] = 'TRUE' if self.options.shared else 'FALSE'
 
