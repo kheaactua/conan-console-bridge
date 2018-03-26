@@ -1,5 +1,5 @@
 import os, re
-from conans import ConanFile, CMake
+from conans import ConanFile, CMake, tools
 
 
 class ConsolebridgeConan(ConanFile):
@@ -29,6 +29,18 @@ class ConsolebridgeConan(ConanFile):
         self.run(f'cd {self.name} && git checkout {version}')
 
     def build(self):
+
+        # The way the config file is written to is dumb, and breaks on windows.
+        tools.replace_in_file(
+            file_path=os.path.join(self.name, 'CMakeLists.txt'),
+            search=r'configure_file("${cmake_conf_file}.in" "${CMAKE_BINARY_DIR}/${cmake_conf_file}" @ONLY)',
+            replace='get_filename_component(cmake_conf_file_basename ${cmake_conf_file} NAME)\nconfigure_file("${cmake_conf_file}.in" "${CMAKE_BINARY_DIR}/${cmake_conf_file_basename}" @ONLY)'
+        )
+        tools.replace_in_file(
+            file_path=os.path.join(self.name, 'CMakeLists.txt'),
+            search='install(FILES ${CMAKE_BINARY_DIR}/${cmake_conf_file}',
+            replace='install(FILES ${CMAKE_BINARY_DIR}/${cmake_conf_file_basename}',
+        )
 
         cmake = CMake(self)
         cmake.definitions['BOOST_ROOT:PATH'] = self.deps_cpp_info['boost'].rootpath
