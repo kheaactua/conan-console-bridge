@@ -100,6 +100,10 @@ class ConsolebridgeConan(ConanFile):
         pass
 
     def package_info(self):
-        pass
+        if 'Windows' == self.settings.os:
+            # console_bridge installs the dll to the lib directory.  We prefer to
+            # see it in the bin/ directory, but because there are CMake files and
+            # stuff, we're just going to point bin at lib for simplicity.
+            self.cpp_info.bindirs = self.cpp_info.libdirs
 
 # vim: ts=4 sw=4 expandtab ffs=unix ft=python foldmethod=marker :
