@@ -14,7 +14,7 @@ class ConsolebridgeConan(ConanFile):
     license     = 'Creative Commons Attribution 3.0'
     url         = 'http://wiki.ros.org/console_bridge'
     description = 'console_bridge is a ROS-independent, pure CMake (i.e. non-catkin and non-rosbuild package) that provides logging calls that mirror those found in rosconsole, but for applications that are not necessarily using ROS.'
-    settings = 'os', 'compiler', 'build_type', 'arch'
+    settings = 'os', 'compiler', 'build_type', 'arch', 'arch_build'
     generators = 'cmake'
     requires = (
         'boost/[>1.46]@ntc/stable',
@@ -34,6 +34,12 @@ class ConsolebridgeConan(ConanFile):
         self.options['boost'].shared = self.options.shared
         if self.settings.compiler != "Visual Studio":
             self.options['boost'].fPIC = self.options['boost'].shared
+
+    def build_requirements(self):
+        if self.settings.arch_build == 'x86':
+            self.build_requires('cmake_installer/[>3.2.0,<=3.6.3]@conan/stable')
+        else:
+            self.build_requires('cmake_installer/[>3.2.0]@conan/stable')
 
     def source(self):
         self.run(f'git clone https://github.com/ros/console_bridge.git {self.name}')
