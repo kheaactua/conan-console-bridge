@@ -35,12 +35,6 @@ class ConsolebridgeConan(ConanFile):
         if self.settings.compiler != "Visual Studio":
             self.options['boost'].fPIC = self.options['boost'].shared
 
-    def build_requirements(self):
-        if self.settings.arch_build == 'x86':
-            self.build_requires('cmake_installer/[>3.2.0,<=3.6.3]@conan/stable')
-        else:
-            self.build_requires('cmake_installer/[>3.2.0]@conan/stable')
-
     def source(self):
         self.run(f'git clone https://github.com/ros/console_bridge.git {self.name}')
 
