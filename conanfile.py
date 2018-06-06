@@ -28,12 +28,7 @@ class ConsolebridgeConan(ConanFile):
 
     def config_options(self):
         if self.settings.compiler == "Visual Studio":
-            self.options.remove("fPIC")
-
-    def configure(self):
-        self.options['boost'].shared = self.options.shared
-        if self.settings.compiler != "Visual Studio":
-            self.options['boost'].fPIC = self.options['boost'].shared
+            self.options.remove('fPIC')
 
     def source(self):
         self.run(f'git clone https://github.com/ros/console_bridge.git {self.name}')
