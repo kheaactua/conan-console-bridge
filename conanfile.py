@@ -10,7 +10,7 @@ class ConsolebridgeConan(ConanFile):
     """ Testing with indigo and 0.4.0 """
 
     name        = 'console_bridge'
-    version     = 'indigo'
+    version     = 'master'
     license     = 'Creative Commons Attribution 3.0'
     url         = 'http://wiki.ros.org/console_bridge'
     description = 'console_bridge is a ROS-independent, pure CMake (i.e. non-catkin and non-rosbuild package) that provides logging calls that mirror those found in rosconsole, but for applications that are not necessarily using ROS.'
@@ -27,31 +27,14 @@ class ConsolebridgeConan(ConanFile):
     default_options = ('shared=True', 'fPIC=True', 'cxx11=True')
 
     def config_options(self):
-        if self.settings.compiler == "Visual Studio":
+        if 'Visual Studio' == self.settings.compiler:
             self.options.remove('fPIC')
 
     def source(self):
-        self.run(f'git clone https://github.com/ros/console_bridge.git {self.name}')
-
-        version = self.version
-        if self.version in ['indigo', 'hydro']:
-            version = f'{self.version}-devel'
-        self.run(f'cd {self.name} && git checkout {version}')
+        g = tools.Git(folder=self.name)
+        g.clone('https://github.com/ros/console_bridge.git', branch='master')
 
     def build(self):
-
-        # The way the config file is written to is dumb, and breaks on windows.
-        tools.replace_in_file(
-            file_path=os.path.join(self.name, 'CMakeLists.txt'),
-            search=r'configure_file("${cmake_conf_file}.in" "${CMAKE_BINARY_DIR}/${cmake_conf_file}" @ONLY)',
-            replace='get_filename_component(cmake_conf_file_basename ${cmake_conf_file} NAME)\nconfigure_file("${cmake_conf_file}.in" "${CMAKE_BINARY_DIR}/${cmake_conf_file_basename}" @ONLY)'
-        )
-        tools.replace_in_file(
-            file_path=os.path.join(self.name, 'CMakeLists.txt'),
-            search='install(FILES ${CMAKE_BINARY_DIR}/${cmake_conf_file}',
-            replace='install(FILES ${CMAKE_BINARY_DIR}/${cmake_conf_file_basename}',
-        )
-
         cmake = CMake(self)
 
         if 'fPIC' in self.options and self.options.fPIC:
@@ -99,7 +82,7 @@ class ConsolebridgeConan(ConanFile):
         pass
 
     def package_info(self):
-        if 'Windows' == self.settings.os:
+        if tools.os_info.is_windows:
             # console_bridge installs the dll to the lib directory.  We prefer to
             # see it in the bin/ directory, but because there are CMake files and
             # stuff, we're just going to point bin at lib for simplicity.
