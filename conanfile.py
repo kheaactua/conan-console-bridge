@@ -18,6 +18,7 @@ class ConsolebridgeConan(ConanFile):
     generators = 'cmake'
     requires = (
         'boost/[>1.46]@ntc/stable',
+        'helpers/0.3@ntc/stable',
     )
     options = {
         'shared': [True, False],
@@ -82,6 +83,14 @@ class ConsolebridgeConan(ConanFile):
         pass
 
     def package_info(self):
+        self.cpp_info.libs = tools.collect_libs(self)
+
+        # Populate the pkg-config environment variables
+        with tools.pythonpath(self):
+            from platform_helpers import adjustPath, appendPkgConfigPath
+            self.env_info.PKG_CONFIG_FLANN_PREFIX = adjustPath(self.package_folder)
+            appendPkgConfigPath(adjustPath(os.path.join(self.package_folder, 'lib', 'pkgconfig')), self.env_info)
+
         if tools.os_info.is_windows:
             # console_bridge installs the dll to the lib directory.  We prefer to
             # see it in the bin/ directory, but because there are CMake files and
