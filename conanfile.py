@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: future_fstrings -*-
 # -*- coding: utf-8 -*-
 
 import os, re
@@ -7,19 +6,14 @@ from conans import ConanFile, CMake, tools
 
 
 class ConsolebridgeConan(ConanFile):
-    """ Testing with indigo and 0.4.0 """
-
     name        = 'console_bridge'
-    version     = 'master'
+    version     = '0.4.2'
     license     = 'Creative Commons Attribution 3.0'
     url         = 'http://wiki.ros.org/console_bridge'
     description = 'console_bridge is a ROS-independent, pure CMake (i.e. non-catkin and non-rosbuild package) that provides logging calls that mirror those found in rosconsole, but for applications that are not necessarily using ROS.'
     settings = 'os', 'compiler', 'build_type', 'arch', 'arch_build'
     generators = 'cmake'
-    requires = (
-        'boost/[>1.46]@ntc/stable',
-        'helpers/0.3@ntc/stable',
-    )
+    requires   = 'boost/[>1.46]@ntc/stable'
     options = {
         'shared': [True, False],
         'fPIC':   [True, False],
@@ -33,7 +27,7 @@ class ConsolebridgeConan(ConanFile):
 
     def source(self):
         g = tools.Git(folder=self.name)
-        g.clone('https://github.com/ros/console_bridge.git', branch='master')
+        g.clone('https://github.com/ros/console_bridge.git', branch=self.version)
 
     def build(self):
         cmake = CMake(self)
@@ -85,11 +79,10 @@ class ConsolebridgeConan(ConanFile):
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
 
-        # Populate the pkg-config environment variables
-        with tools.pythonpath(self):
-            from platform_helpers import adjustPath, appendPkgConfigPath
-            self.env_info.PKG_CONFIG_FLANN_PREFIX = adjustPath(self.package_folder)
-            appendPkgConfigPath(adjustPath(os.path.join(self.package_folder, 'lib', 'pkgconfig')), self.env_info)
+        # Console Bridge does have pkg-config files, but nothing I've come
+        # acrosses uses them.  So to avoid the helpers requirement
+        # ( https://github.com/kheaactua/conan-build-helpers ) , simply skipping
+        # exporting the pkg-config environment here
 
         if tools.os_info.is_windows:
             # console_bridge installs the dll to the lib directory.  We prefer to
